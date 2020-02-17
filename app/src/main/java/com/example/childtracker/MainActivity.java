@@ -23,8 +23,12 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -62,6 +66,57 @@ public class MainActivity extends AppCompatActivity implements
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
 
+
+
+
+
+        //-------------------
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+        enableMyLocation();
+
+       // lat =mMap.ge
+        // Add a marker in Sydney, Australia, and move the camera.
+        LatLng sydney = new LatLng(lat, lon);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in BCC"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+
+
+    }
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing.
+            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE,
+                    Manifest.permission.ACCESS_FINE_LOCATION, true);
+        } else if (mMap != null) {
+            // Access to the location has been granted to the app.
+            mMap.setMyLocationEnabled(true);
+        }
     }
 
 
@@ -104,32 +159,13 @@ public class MainActivity extends AppCompatActivity implements
         myFirebaseRef.child(id.getText().toString()).child("lon").setValue(lon);
 
 
-       // studentid = (EditText) findViewById(R.id.editstudentid);
-      //  cellphone = (EditText) findViewById(R.id.editcellphone);
-       // schoolemail = (EditText) findViewById(R.id.editschoolemail);
 
-
-//        if(name.getText().length() == 0 || schoolemail.getText().length() == 0){
-//
-//            Toast.makeText(getApplicationContext(),"error!!", Toast.LENGTH_SHORT).show();
-//        }else{
-//
-//
-//            myFirebaseRef.child(name.getText().toString()).child("studentID").setValue(studentid.getText().toString());
-//            myFirebaseRef.child(name.getText().toString()).child("cellphone").setValue(cellphone.getText().toString());
-//            myFirebaseRef.child(name.getText().toString()).child("schoolemail").setValue(schoolemail.getText().toString());
-//
-//
-//        }
 
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 System.out.println(dataSnapshot.getValue());
-                //schoolemail.getText().clear();
-               // name.getText().clear();
-               // studentid.getText().clear();
-               // cellphone.getText().clear();
+           
                 Toast.makeText(getApplicationContext(),"uploaded to server!!", Toast.LENGTH_SHORT).show();
 
 
@@ -146,10 +182,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
 
-
-
-
-
     }
 
     @Override
@@ -159,6 +191,10 @@ public class MainActivity extends AppCompatActivity implements
         System.out.println(location.getLongitude());
         lat = location.getLatitude();
         lon = location.getLongitude();
+        LatLng sydney = new LatLng(lat, lon);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in BCC"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
 
     }
 
@@ -187,8 +223,5 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
 
-    }
 }
