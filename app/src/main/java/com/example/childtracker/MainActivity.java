@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
 
     protected LocationManager locationManager;
+
+    //sets default lat and lon
     double lat = 0;
     double lon = 0;
     private GoogleMap mMap;
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
+//checks for permissions
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     this,
@@ -73,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements
         //-------------------
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+
+
+        //checks for permissions
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    Activity#requestPermissions
@@ -91,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
+
+    //loads when map is ready
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -98,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
         mMap.setOnMyLocationClickListener(this);
         enableMyLocation();
 
-       // lat =mMap.ge
+
         // Add a marker in Sydney, Australia, and move the camera.
         LatLng sydney = new LatLng(lat, lon);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in BCC"));
@@ -107,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements
 
 
     }
+
+    //enables users location
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -148,24 +158,24 @@ public class MainActivity extends AppCompatActivity implements
 
 
         Firebase.setAndroidContext(this);
-
+        //gets referneces from firebase
         Firebase myFirebaseRef = new Firebase("https://mobiletracker-d4f90.firebaseio.com/");
 
 
         EditText id = (EditText) findViewById(R.id.editText);
 
-
+        //sends data to server
         myFirebaseRef.child(id.getText().toString()).child("lat").setValue(lat);
         myFirebaseRef.child(id.getText().toString()).child("lon").setValue(lon);
 
 
 
-
+//confirms if database has gotten updated values
         myFirebaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 System.out.println(dataSnapshot.getValue());
-           
+
                 Toast.makeText(getApplicationContext(),"uploaded to server!!", Toast.LENGTH_SHORT).show();
 
 
@@ -183,41 +193,45 @@ public class MainActivity extends AppCompatActivity implements
 
 
     }
-
+    //nupdates marker if location has been changes
     @Override
     public void onLocationChanged(Location location) {
-
+        //prints out lat and lon
         System.out.println("lat:" + location.getLatitude());
         System.out.println(location.getLongitude());
+
+
         lat = location.getLatitude();
         lon = location.getLongitude();
         LatLng sydney = new LatLng(lat, lon);
+
+        //sets markers on maps
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in BCC"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
 
     }
-
+//not using this
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
 
     }
-
+    //not using this
     @Override
     public void onProviderEnabled(String provider) {
 
     }
-
+    //not using this
     @Override
     public void onProviderDisabled(String provider) {
 
     }
-
+    //not using this
     @Override
     public boolean onMyLocationButtonClick() {
         return false;
     }
-
+    //not using this
     @Override
     public void onMyLocationClick(@NonNull Location location) {
 
